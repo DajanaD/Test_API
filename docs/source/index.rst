@@ -3,120 +3,74 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to DataScience_project documentation
-============================================
+Welcome to Tes_API documentation
+================================
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-DataScience_project Users
-=========================
+Tes_API Users
+=============
 
 .. automodule:: app.repositories.users
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Transaction
-===============================
+Tes_API Comments
+================
 
-.. automodule:: app.repositories.transactions
+.. automodule:: app.repositories.comments
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Rate
-========================
+Tes_API Posts
+=============
 
-.. automodule:: app.repositories.rates
+.. automodule:: app.repositories.posts
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Payment
-===========================
 
-.. automodule:: app.repositories.payments
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project Parking
-===========================
-
-.. automodule:: app.repositories.parkings
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project Car
-=======================
-
-.. automodule:: app.repositories.cars
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project BlackList
-=============================
+Tes_API BlackList
+=================
 
 .. automodule:: app.repositories.black_list
   :members:
   :undoc-members:
   :show-inheritance:  
 
-DataScience_project Users
-=========================
+Tes_API Users
+=============
 
 .. automodule:: app.routers.users
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Transaction
-===============================
+Tes_API Comments
+================
 
-.. automodule:: app.routers.transactions
+.. automodule:: app.routers.comments
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Rate
-========================
+Tes_API Posts
+=============
 
-.. automodule:: app.routers.rates
+.. automodule:: app.routers.posts
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Payment
-===========================
 
-.. automodule:: app.routers.payments
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project Parking
-===========================
-
-.. automodule:: app.routers.parking
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project Me
-======================
-
-.. automodule:: app.routers.me
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project Checker
-===========================
+Tes_API Checker
+===============
 
 .. automodule:: app.routers.checkers
   :members:
@@ -124,87 +78,57 @@ DataScience_project Checker
   :show-inheritance:
   
 
-DataScience_project Car
-========================
 
-.. automodule:: app.routers.cars
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project BlackList
-=============================
+Tes_API BlackList
+=================
 
 .. automodule:: app.routers.black_list
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Auth
-========================
+Tes_API Auth
+============
 
 .. automodule:: app.routers.auth
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project All
-========================
+Tes_API All
+===========
 
 .. automodule:: app.routers.all
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Users
-===========================
+Tes_API Users
+=============
 
 .. automodule:: app.services.users
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Transaction
-===============================
+Tes_API Comments
+================
 
-.. automodule:: app.services.transactions
+.. automodule:: app.services.comments
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Rate
-========================
+Tes_API Posts
+=============
 
-.. automodule:: app.services.rates
+.. automodule:: app.services.posts
   :members:
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Payment
-===========================
 
-.. automodule:: app.services.payments
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project Parking
-===========================
-
-.. automodule:: app.services.parkings
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project Car
-=========================
-
-.. automodule:: app.services.cars
-  :members:
-  :undoc-members:
-  :show-inheritance:
-
-DataScience_project BlackList
+Tes_API BlackList
 =============================
 
 .. automodule:: app.services.black_list
@@ -212,7 +136,7 @@ DataScience_project BlackList
   :undoc-members:
   :show-inheritance:
 
-DataScience_project Auth
+Tes_API Auth
 ========================
 
 .. automodule:: app.services.auth

@@ -23,9 +23,9 @@ sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 sys.path.insert(0, os.path.abspath('../stubs'))
 
-project = 'DataScience_project'
-copyright = '2024, Group5'
-author = 'Group5'
+project = 'Test_API'
+copyright = 'Diana'
+author = 'Diana'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

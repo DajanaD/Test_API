@@ -2,9 +2,9 @@ import sys
 import os
 
 sys.path.append(os.path.abspath('..'))
-project = 'DataScience_project'
-copyright = '2024, Group5'
-author = 'Group5'
+project = 'Test_API'
+copyright = 'Diana'
+author = 'Diana'
 
 extensions = ['sphinx.ext.autodoc']
 

@@ -131,3 +131,5 @@ class PostService:
         async with uow:
             posts = await uow.posts.find_by_period(period)
             return [PostLiteResponse.from_orm(post) for post in posts]
+        
+        

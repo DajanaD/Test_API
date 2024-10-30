@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Depends, status
-
+from fastapi import APIRouter, Depends, status, BackgroundTasks
+import asyncio
 from app.models.users import User
-from app.models.comments import Comment
-from app.schemas.comments import CommentSchemaAdd, CommentSchemaUpdate, CommentResponse
+from app.models.comments import Comment, CommentStatus, CommentStatus
+from app.schemas.comments import CommentSchemaAdd, CommentSchemaUpdate, CommentResponse,  CommentDailyBreakdown
 from app.services.comments import CommentService
 from app.services.auth import auth_service
 from app.utils.dependencies import UOWDep
 from app.utils.guard import guard
+from datetime import date
+import time
 
 router = APIRouter(prefix="/comments", tags=["Comments"])
 
@@ -17,17 +19,17 @@ async def get_comment(
         comment_service: CommentService = Depends(),
         current_user: User = Depends(guard.is_admin),
 ):
-    """Retrieve a list of all cars.
+    """Retrieve a list of all comments.
 
-    This endpoint returns a list of all cars from the database. Access is restricted to admin users only.
+    This endpoint returns a list of all comments from the database. Access is restricted to admin users only.
 
     Args:
         uow (UOWDep): Dependency for unit of work management.
-        cars_service (CarsService): Service for managing car-related operations.
+        comment_service (CommentService): Service for managing comment-related operations.
         current_user (User): The currently authenticated user, required to be an admin.
 
     Returns:
-        list[CarResponse]: A list of car objects with details.
+        list[CommentResponse]: A list of comment objects with details.
     """
     comments = await comment_service.get_comments(uow)
     return comments
@@ -40,18 +42,18 @@ async def get_comment(
         comments_service: CommentService = Depends(),
         current_user: User = Depends(guard.is_admin),
 ):
-    """Retrieve a specific car by its ID.
+    """Retrieve a specific comment by its ID.
 
-    This endpoint returns details of a car identified by its unique ID. Access is restricted to admin users only.
+    This endpoint returns details of a comment identified by its unique ID. Access is restricted to admin users only.
 
     Args:
-        car_id (int): The ID of the car to retrieve.
+        comment_id (int): The ID of the comment to retrieve.
         uow (UOWDep): Dependency for unit of work management.
-        cars_service (CarsService): Service for managing car-related operations.
+        comments_service (CommentService): Service for managing comment-related operations.
         current_user (User): The currently authenticated user, required to be an admin.
 
     Returns:
-        CarResponse: Details of the car with the specified ID.
+        CommentResponse: Details of the comment with the specified ID.
     """
     return await comments_service.get_comment_by_id(uow, comment_id)
 
@@ -63,18 +65,18 @@ async def add_comment(
         comments_service: CommentService = Depends(),
         current_user: User = Depends(guard.is_admin),
 ):
-    """Add a new car to the database.
+    """Add a new comment to the database.
 
-    This endpoint adds a new car based on the provided data and returns the details of the newly created car. Access is restricted to admin users only.
+    This endpoint adds a new comment based on the provided data and returns the details of the newly created comment. Access is restricted to admin users only.
 
     Args:
         uow (UOWDep): Dependency for unit of work management.
-        car_data (CarSchemaAdd): Data required to create a new car.
-        cars_service (CarsService): Service for managing car-related operations.
+        comment_data (CommentSchemaAdd): Data required to create a new comment.
+        comments_service (CommentService): Service for managing comment-related operations.
         current_user (User): The currently authenticated user, required to be an admin.
 
     Returns:
-        CarResponse: Details of the newly created car.
+        CommentResponse: Details of the newly created comment.
     """
     comment_id = await comments_service.add_comment(uow, comment_data)
     return await comments_service.get_comment_by_id(uow, comment_id)
@@ -88,19 +90,19 @@ async def update_comment(
         comments_service: CommentService = Depends(),
         current_user: User = Depends(guard.is_admin),
 ):
-    """Update details of an existing car.
+    """Update details of an existing comment.
 
-    This endpoint updates the details of a car identified by its ID. Access is restricted to admin users only. The current user must be the owner of the car.
+    This endpoint updates the details of a comment identified by its ID. Access is restricted to admin users only. The current user must be the owner of the comment.
 
     Args:
-        car_id (int): The ID of the car to update.
-        car_data (CarSchemaUpdate): Updated data for the car.
+        comment_id (int): The ID of the comment to update.
+        comment_data (CommentSchemaUpdate): Updated data for the comment.
         uow (UOWDep): Dependency for unit of work management.
-        cars_service (CarsService): Service for managing car-related operations.
+        comments_service (CommentService): Service for managing comment-related operations.
         current_user (User): The currently authenticated user, required to be an admin.
 
     Returns:
-        CarResponse: Details of the updated car.
+        CommentResponse: Details of the updated comment.
     """
     comment = await comments_service.get_comment_by_id(uow, comment_id)
     await guard.is_owner(current_user, comment)
@@ -114,17 +116,96 @@ async def delete_comment(
         comments_service: CommentService = Depends(),
         current_user: User = Depends(guard.is_admin),
 ):
-    """Delete a car by its ID.
+    """Delete a comment by its ID.
 
-    This endpoint deletes a car identified by its ID from the database. Access is restricted to admin users only.
+    This endpoint deletes a comment identified by its ID from the database. Access is restricted to admin users only.
 
     Args:
-        car_id (int): The ID of the car to delete.
+        comment_id (int): The ID of the comment to delete.
         uow (UOWDep): Dependency for unit of work management.
-        cars_service (CarsService): Service for managing car-related operations.
+        comments_service (CommentService): Service for managing comment-related operations.
         current_user (User): The currently authenticated user, required to be an admin.
 
     Returns:
         None: No content is returned upon successful deletion.
     """
     await comments_service.delete_comment(uow, comment_id)
+# Comment Analytics
+@router.get("/daily-breakdown", response_model=list[CommentDailyBreakdown])
+async def get_comments_daily_breakdown(
+    date_from: date,
+    date_to: date,
+    uow: UOWDep,
+    comment_service: CommentService = Depends(),
+):
+    """
+    Retrieve daily breakdown of comments.
+
+    This endpoint returns the count of created and blocked comments
+    over a specified time period.
+
+    Args:
+        date_from (date): The starting date for analysis.
+        date_to (date): The ending date for analysis.
+        uow (UOWDep): Dependency for unit of work management.
+        comment_service (CommentService): Service for managing comment-related operations.
+
+    Returns:
+        list[CommentDailyBreakdown]: A list of objects containing the count of created and blocked comments by day.
+    """
+    return await comment_service.get_comments_daily_breakdown(uow, date_from, date_to)
+
+@router.post("/", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
+async def add_comment_with_autoreply(
+    uow: UOWDep,
+    comment_data: CommentSchemaAdd,
+    comments_service: CommentService = Depends(),
+    current_user: User = Depends(guard.is_admin),
+    background_tasks: BackgroundTasks = Depends()
+):
+    """
+    Add a new comment to the database.
+
+    This endpoint creates a new comment based on the provided data and 
+    returns the details of the created comment. If the user has 
+    auto-replies enabled, a task to send the reply is added to the background.
+
+    Args:
+        uow (UOWDep): Dependency for unit of work management.
+        comment_data (CommentSchemaAdd): Data required to create a new comment.
+        comments_service (CommentService): Service for managing comment-related operations.
+        current_user (User): The currently authenticated user, required for access control.
+        background_tasks (BackgroundTasks): Dependency for managing background tasks.
+
+    Returns:
+        CommentResponse: Details of the newly created comment.
+    """
+    comment_id = await comments_service.add_comment(uow, comment_data)
+
+    # If auto-reply is enabled, add a task
+    user = await comments_service.get_user_by_id(comment_data.owner_id)
+    if user.auto_reply_enabled:
+        delay = user.auto_reply_delay
+        background_tasks.add_task(send_auto_reply, uow, comment_id, delay)
+
+    return await comments_service.get_comment_by_id(uow, comment_id)
+
+async def send_auto_reply(uow: UOWDep, comment_id: int, delay: int):
+    """
+    Send an automatic reply after a delay.
+
+    This function sends an automatic reply to a comment after the specified delay.
+
+    Args:
+        uow (UOWDep): Dependency for unit of work management.
+        comment_id (int): The ID of the comment to which the reply is sent.
+        delay (int): The delay in seconds before sending the reply.
+    """
+    await asyncio.sleep(delay)
+    
+    # Logic for sending the reply
+    async with uow:
+        comment = await uow.comments.get(comment_id)
+        if comment:
+            auto_reply_content = f"Спасибо за ваш комментарий: '{comment.description}'."
+            await uow.comments.add(Comment(description=auto_reply_content, owner_id=comment.owner_id, status=CommentStatus.CREATED))

@@ -1,16 +1,17 @@
 from fastapi import HTTPException, status
+from datetime import date
 
 from app.models import Comment
 from app.utils.unitofwork import UnitOfWork
-from app.schemas.comments import CommentSchemaAdd, CommentSchemaUpdate, CommentResponse
-
+from app.schemas.comments import CommentSchemaAdd, CommentSchemaUpdate, CommentResponse, CommentDailyBreakdown
 
 
 class CommentService:
     """
-    Service class for managing comment operations, including adding, updating, retrieving, and deleting comments.
+    Service class for managing comment operations, including adding, updating, retrieving,
+    and deleting comments.
     """
-    
+
     async def add_comment(self, uow: UnitOfWork, comment_data: CommentSchemaAdd) -> int:
         """
         Adds a new comment to the system.
@@ -138,3 +139,37 @@ class CommentService:
         async with uow:
             comments = await uow.comments.find_by_owner_id(owner_id)
             return comments
+        
+    async def get_comments_daily_breakdown(self, uow: UnitOfWork, date_from: date, date_to: date) -> list[CommentDailyBreakdown]:
+        """
+        Retrieves a daily breakdown of comments created and blocked within a specified date range.
+
+        Args:
+            uow (UnitOfWork): The unit of work instance for database transactions.
+            date_from (date): The start date for the breakdown.
+            date_to (date): The end date for the breakdown.
+
+        Returns:
+            list[CommentDailyBreakdown]: A list of daily comment breakdowns, including counts of created
+            and blocked comments.
+
+        Raises:
+            HTTPException: If there are issues with the database query.
+        """
+        async with uow:
+            results = await uow.comments.session.execute(
+                """
+                SELECT date(created_at) as date,
+                    COUNT(*) FILTER (WHERE status = 'created') AS created_comments,
+                    COUNT(*) FILTER (WHERE status = 'blocked') AS blocked_comments
+                FROM comments
+                WHERE created_at BETWEEN :date_from AND :date_to
+                GROUP BY date
+                ORDER BY date;
+                """,
+                {"date_from": date_from, "date_to": date_to}
+            )
+            return [
+                CommentDailyBreakdown(date=row[0], created_comments=row[1], blocked_comments=row[2])
+                for row in results.fetchall()
+            ]

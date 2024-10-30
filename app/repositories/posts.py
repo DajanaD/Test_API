@@ -11,39 +11,15 @@ class PostRepository(SQLAlchemyRepository):
     """
     model = Post
 
-    async def find_all_post(self, active_only: bool = False) -> list[Post]:
-        """Finds all post, optionally filtering by active status.
+    async def find_all_posts(self, active_only: bool = False) -> list[Post]:
+        """Finds all posts, optionally filtering by active status.
 
         Args:
-            active_only (bool, optional): Whether to filter by active parkings. Defaults to False.
-
-        Returns:
-            list[Post]: A list of Parking objects.
-        """
-        stmt = select(self.model)
-        if active_only:
-            stmt = stmt.where(self.model.is_active == True)
-
-        result = await self.session.execute(stmt)
-        return result.scalars().all()
-
-    async def find_by_comment_id(self, comments_id: int) -> list[Post]:
-        """Finds all post associated with a specific comment ID.
-
-        Args:
-            car_id (int): The ID of the car.
+            active_only (bool, optional): Whether to filter by active posts. Defaults to False.
 
         Returns:
             list[Post]: A list of Post objects.
         """
-        stmt = select(self.model).where(self.model.comments_id == comments_id)
-        result = await self.session.execute(stmt)
-        return result.scalars().all()
-
-class PostRepository(SQLAlchemyRepository):
-    model = Post
-
-    async def find_all_posts(self, active_only: bool = False) -> list[Post]:
         stmt = select(self.model)
         if active_only:
             stmt = stmt.where(self.model.is_active == True)
@@ -51,8 +27,15 @@ class PostRepository(SQLAlchemyRepository):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-
     async def find_by_comment_id(self, comment_id: int) -> list[Post]:
+        """Finds all posts associated with a specific comment ID.
+
+        Args:
+            comment_id (int): The ID of the comment.
+
+        Returns:
+            list[Post]: A list of Post objects.
+        """
         stmt = select(self.model).where(self.model.comment_id == comment_id)
         result = await self.session.execute(stmt)
         return result.scalars().all()

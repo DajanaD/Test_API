@@ -74,3 +74,5 @@ async def delete_black_list(
         None: No content is returned upon successful deletion.
     """
     await black_list_service.delete_black_list(uow, license_plate)
+
+    
