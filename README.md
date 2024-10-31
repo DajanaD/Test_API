@@ -28,7 +28,7 @@ To run the Photo Share project locally, follow these steps:
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/rusetskiy1974/DataScience_project
+   git clone https://github.com/DajanaD/Test_API
    ```
 
 2. Install dependencies:
