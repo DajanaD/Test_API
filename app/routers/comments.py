@@ -157,11 +157,11 @@ async def get_comments_daily_breakdown(
 
 @router.post("/", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
 async def add_comment_with_autoreply(
+    background_tasks: BackgroundTasks,
     uow: UOWDep,
     comment_data: CommentSchemaAdd,
     comments_service: CommentService = Depends(),
     current_user: User = Depends(guard.is_admin),
-    background_tasks: BackgroundTasks = Depends()
 ):
     """
     Add a new comment to the database.

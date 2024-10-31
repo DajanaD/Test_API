@@ -123,7 +123,7 @@ class CommentService:
                     status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found"
                 )
             await uow.comments.delete_one(id=comment_id)
-            return comment
+            return CommentResponse.from_orm(comment)
 
     async def get_comments_by_owner_id(self, uow: UnitOfWork, owner_id: int) -> list[Comment]:
         """
